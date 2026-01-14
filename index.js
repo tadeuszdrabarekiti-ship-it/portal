@@ -86,7 +86,7 @@ app.get(/^\/portal\/(.*)/, async (req, res) => {
   return res.status(404).send('<html><head><title>404 Not Found</title></head><body style="font-family:sans-serif;text-align:center;padding:2em;"><h1>404 Not Found</h1><p>Brak konfiguracji path/template dla strony: ' + pageName + '</p></body></html>');
 });
 
-/*
+
 // Obsługa serwowania plików z katalogu 'portal' (GET /pages/***)
 app.get(/^\/pages\/(.*)/, (req, res) => {
   let relPath = req.params[0] || '';
@@ -108,7 +108,7 @@ app.get(/^\/pages\/(.*)/, (req, res) => {
     fs.createReadStream(filePath).pipe(res);
   });
 });
-*/
+
 
 // --- Endpoint do ręcznego odświeżenia harmonogramu CRON ---
 const SCHEDULER_STATE_FILE = path.join(baseDir, 'scheduler_state.json');
