@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
 const fs = require("fs");
-const { executeFlow, flows: defaultFlows, setBaseDir } = require("./engine");
+const { executeFlow, flows: defaultFlows, setBaseDir, initScheduler } = require("./engine");
 const { syncCronTable } = require('./sync_cron_table');
 
 // --- Obsługa parametrów uruchomienia ---
@@ -86,6 +86,7 @@ app.get(/^\/portal\/(.*)/, async (req, res) => {
   return res.status(404).send('<html><head><title>404 Not Found</title></head><body style="font-family:sans-serif;text-align:center;padding:2em;"><h1>404 Not Found</h1><p>Brak konfiguracji path/template dla strony: ' + pageName + '</p></body></html>');
 });
 
+/*
 // Obsługa serwowania plików z katalogu 'portal' (GET /pages/***)
 app.get(/^\/pages\/(.*)/, (req, res) => {
   let relPath = req.params[0] || '';
@@ -107,6 +108,7 @@ app.get(/^\/pages\/(.*)/, (req, res) => {
     fs.createReadStream(filePath).pipe(res);
   });
 });
+*/
 
 // --- Endpoint do ręcznego odświeżenia harmonogramu CRON ---
 const SCHEDULER_STATE_FILE = path.join(baseDir, 'scheduler_state.json');
@@ -137,10 +139,6 @@ app.post('/admin/recalculate_cron_table', (req, res) => {
   });
 });
 
-
-
-// ...usunięto powtórzone logi i deklaracje app...
-
 // Endpoint do restartu aplikacji
 app.post('/admin/restart', (req, res) => {
   res.json({ message: 'Restarting app...' });
@@ -168,6 +166,10 @@ if (fs.existsSync(FLOWS_PATH) && fs.statSync(FLOWS_PATH).isDirectory()) {
     console.error('Błąd odczytu katalogu flows:', e);
   }
 }
+
+// --- Inicjalizacja schedulera CRON ---
+initScheduler(flows);
+
 for (const flow of flows) {
   if (flow.type === 'CRON') continue; // nie rejestrujemy endpointu HTTP dla CRON
   if (flow.type === 'FLOW') continue; // nie rejestrujemy endpointu HTTP dla FLOW
@@ -190,10 +192,12 @@ for (const flow of flows) {
 }
 
 
+/*
 // Endpoint do logów (surowe logi i statyczne pliki)
 const logsRoute = require('./logsRoute');
 app.use(logsRoute);
 app.use(express.static(__dirname)); // serwuj logs.html i logs.js
+*/
 
 const PORT = customPort || process.env.PORT || 3001;
 app.listen(PORT, () => {

@@ -114,12 +114,15 @@ function getNextRun(cron, now) {
 
 
 // --- SCHEDULER STATE ---
-const SCHEDULER_STATE_FILE = path.join(__dirname, 'scheduler_state.json');
 let schedulerState = [];
 const { syncCronTable } = require('./sync_cron_table');
 
-// Inicjalizacja stanu przy starcie (po załadowaniu flows)
-loadSchedulerState();
+// Inicjalizacja stanu - wywołaj po wczytaniu flows z index.js
+function initScheduler(loadedFlows) {
+  // Aktualizuj flows w engine.js
+  flows = loadedFlows || flows;
+  loadSchedulerState();
+}
 
 // --- CYKLICZNY TICK SCHEDULERA ---
 function parseLocalDateTime(str) {
@@ -158,7 +161,7 @@ setInterval(() => {
           job.running = false;
           saveSchedulerState();
           // Loguj NEXT RUN na końcu, po przeliczeniu nowego nextRun
-          const logPath = path.join(__dirname, 'logs', `${now2.getFullYear()}-${(now2.getMonth()+1).toString().padStart(2,'0')}-${now2.getDate().toString().padStart(2,'0')}.log`);
+          const logPath = path.join(getLogsDir(), `${now2.getFullYear()}-${(now2.getMonth()+1).toString().padStart(2,'0')}-${now2.getDate().toString().padStart(2,'0')}.log`);
           const pad = n => n.toString().padStart(2, '0');
           const ts = `${pad(now2.getDate())}-${pad(now2.getMonth()+1)}-${now2.getFullYear()} ${pad(now2.getHours())}:${pad(now2.getMinutes())}:${pad(now2.getSeconds())}.${now2.getMilliseconds().toString().padStart(3,'0')}`;
           fs.appendFileSync(logPath, `[${ts}] [${job.traceId}] NEXT RUN: ${job.flowName} (${job.cronEntry}) nextRun=${job.nextRun}\n`);
@@ -167,13 +170,13 @@ setInterval(() => {
       saveSchedulerState();
     }
   }
-}, 30000);
+}, 10000); // Co 10 sekund
 
 function loadSchedulerState() {
   // 1. Wczytaj scheduler_state.json jeśli istnieje
-  if (fs.existsSync(SCHEDULER_STATE_FILE)) {
+  if (fs.existsSync(getSchedulerStateFile())) {
     try {
-      const raw = fs.readFileSync(SCHEDULER_STATE_FILE, 'utf8');
+      const raw = fs.readFileSync(getSchedulerStateFile(), 'utf8');
       schedulerState = JSON.parse(raw);
       if (!Array.isArray(schedulerState)) schedulerState = [];
       console.log('[SCHEDULER] Wczytano scheduler_state.json:', schedulerState.length, 'zadan');
@@ -196,16 +199,6 @@ function loadSchedulerState() {
     unchanged: result.unchanged.length
   });
 }
-
-function saveSchedulerState() {
-  try {
-    fs.writeFileSync(SCHEDULER_STATE_FILE, JSON.stringify(schedulerState, null, 2), 'utf8');
-  } catch (e) {
-    console.error('[SCHEDULER] Błąd zapisu scheduler_state.json:', e);
-  }
-}
-
-
 
 function getRef(path, ctx) {
   return path.split(".").reduce((o, k) => (o ? o[k] : undefined), ctx);
@@ -796,4 +789,4 @@ async function executeFlow(flow, req, res, parentCtx, startStep=null) {
 }
 
 
-module.exports = { executeFlow, callFlow, flows, setBaseDir };
+module.exports = { executeFlow, callFlow, flows, setBaseDir, initScheduler };
