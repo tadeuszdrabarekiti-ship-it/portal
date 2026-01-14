@@ -1,0 +1,9 @@
+{
+  "watch": ["."],
+  "ext": "js,json",
+  "ignore": [
+    "scheduler_state.json",
+    "logs/*",
+    "pages/**"
+  ]
+}

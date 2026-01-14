@@ -1,0 +1,21 @@
+{
+    "authorization":{
+        "path": "/authorization.html"
+    },
+    "example":{
+        "path": null,
+        "title": "Przykładowa Strona",
+        "description": "Przykładowa strona wykorzystująca szablon i funkcje autoryzacji.",
+        "auth": true,
+        "template": "/template.html",
+        "useJS": "/pages/example.js"
+    },
+    "elegantes":{
+        "path": null,
+        "title": "Przykładowa Strona 2",
+        "description": "Przykładowa strona wykorzystująca szablon i funkcje autoryzacji.",
+        "auth": false,
+        "template": "/template.html",
+        "useJS": "/pages/elegantes.js"
+    }
+}

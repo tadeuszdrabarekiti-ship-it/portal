@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logi</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+</head>
+<body>
+  <div class="container-fluid py-4">
+    <div class="card shadow-sm p-4" style="margin:0 auto; max-width:98vw;">
+      <h1 class="mb-4">Logi</h1>
+      <div class="mb-3">
+        <label for="logDate" class="form-label">Data logów:</label>
+        <input type="date" id="logDate" class="form-control d-inline-block" style="max-width:300px;display:inline-block;" />
+        <button id="loadLogs" class="btn btn-primary mt-2 ms-2">Pobierz logi</button>
+      </div>
+      <div class="table-responsive" style="width:100%;">
+        <table class="table table-sm table-bordered w-100" id="logsTable" style="table-layout:fixed;word-break:break-all;">
+          <thead><tr><th style="width:60px;">Wiersz</th><th>Treść</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <style>
+    #logsTable td, #logsTable th {
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+    body { margin:0; padding:0; background:#f8f9fa; }
+    .card { border-radius: 12px; }
+  </style>
+  <script src="/logs.js"></script>
+</body>
+</html>
